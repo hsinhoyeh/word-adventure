@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Word Adventure! ✈️🚌🌊</title>
+  <meta name="description" content="Learn English and Chinese words through fun themed puzzles! Free game for kids age 5–12. Three themes, bilingual EN / 繁中, voice reading." />
+
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="https://hsinhoyeh.github.io/word-adventure/" />
+  <meta property="og:title"       content="Word Adventure! 🌟 — Bilingual Word Puzzles for Kids" />
+  <meta property="og:description" content="Learn English and Chinese words through fun themed puzzles! Free game for kids age 5–12. Three themes, bilingual EN / 繁中, voice reading." />
+  <meta property="og:locale"      content="en_US" />
+  <meta property="og:locale:alternate" content="zh_TW" />
+
+  <meta name="twitter:card"        content="summary" />
+  <meta name="twitter:title"       content="Word Adventure! 🌟 — Bilingual Word Puzzles for Kids" />
+  <meta name="twitter:description" content="Learn English and Chinese words through fun themed puzzles! Free game for kids age 5–12. Three themes, bilingual EN / 繁中, voice reading." />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root { --amber:#f59e0b; --amber-light:#fffbeb; --green:#22c55e; --red:#ef4444; --orange:#f97316; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:'Nunito',system-ui,sans-serif; background:linear-gradient(135deg,#f59e0b 0%,#d97706 100%); min-height:100vh; display:flex; align-items:center; justify-content:center; padding:12px; }
+    body.zh { line-height:1.4; }
+
+    .card { background:#fff; border-radius:28px; padding:28px 24px; max-width:580px; width:100%; box-shadow:0 25px 70px rgba(0,0,0,.35); position:relative; overflow:hidden; min-height:520px; }
+    .screen { display:none; flex-direction:column; }
+    .screen.active { display:flex; }
+
+    /* ── lang switch ── */
+    .lang-wrap { position:absolute; top:14px; right:18px; z-index:20; display:flex; align-items:center; gap:8px; }
+    .lang-switch { display:flex; background:#f3f4f6; border-radius:999px; padding:3px; }
+    .lang-btn { border:none; background:transparent; padding:5px 11px; border-radius:999px; font-weight:700; cursor:pointer; color:#374151; font-size:.82rem; font-family:inherit; transition:all .15s; }
+    .lang-btn.active { background:var(--amber); color:#fff; }
+
+    /* ── zhuyin ── */
+    .zy { display:inline-flex; align-items:center; line-height:1; vertical-align:middle; }
+    .zy-c { display:inline-block; }
+    .zy-z { display:inline-flex; align-items:center; margin-left:1px; }
+    .zy-z.zy-neu { flex-direction:column; align-items:center; }
+    .zy-b { writing-mode:vertical-lr; text-orientation:upright; font-size:.38em; font-weight:700; color:#d84315; line-height:.92; letter-spacing:-.5px; user-select:none; }
+    .zy-t { font-size:.32em; font-weight:700; color:#d84315; line-height:1; user-select:none; }
+    .zy-neu .zy-t { margin-bottom:-1px; }
+
+    /* ── ticker ── */
+    .ticker { overflow:hidden; height:52px; position:relative; margin-bottom:10px; }
+    .ticker-v { position:absolute; font-size:2.4rem; top:4px; animation:drive 5s linear infinite; }
+    @keyframes drive { from{left:-80px} to{left:110%} }
+
+    /* ── home ── */
+    #s-home { padding-top:10px; }
+    .home-title { font-size:2.2rem; font-weight:900; color:#1e1b4b; text-align:center; margin-bottom:4px; }
+    .home-sub   { font-size:.95rem; color:#6b7280; text-align:center; margin-bottom:20px; }
+    .label-row  { font-size:.9rem; font-weight:700; color:#4b5563; margin-bottom:10px; }
+    .theme-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:20px; }
+    .theme-card { border-radius:18px; padding:16px 8px 12px; text-align:center; cursor:pointer; border:3px solid #e5e7eb; background:#f9fafb; transition:all .18s; user-select:none; }
+    .theme-card:hover  { border-color:var(--amber); transform:translateY(-2px); }
+    .theme-card.active { border-color:var(--amber); background:var(--amber-light); }
+    .theme-card .big  { font-size:2.4rem; display:block; margin-bottom:6px; }
+    .theme-card .name { font-size:.85rem; font-weight:800; color:#374151; }
+    .diff-row { display:flex; gap:8px; margin-bottom:20px; }
+    .diff-btn { flex:1; padding:10px 4px; border-radius:50px; border:2px solid #e5e7eb; background:#fff; font-family:inherit; font-size:.9rem; font-weight:700; cursor:pointer; transition:all .18s; }
+    .diff-btn:hover  { border-color:var(--amber); }
+    .diff-btn.active { background:var(--amber); color:#fff; border-color:var(--amber); }
+    .name-input { width:100%; padding:13px 18px; border-radius:50px; border:2px solid #e5e7eb; font-family:inherit; font-size:1.05rem; font-weight:600; text-align:center; outline:none; margin-bottom:20px; transition:border-color .18s; }
+    .name-input:focus { border-color:var(--amber); }
+    .play-btn { width:100%; padding:17px; border-radius:50px; border:none; background:linear-gradient(135deg,#f59e0b,#d97706); color:#fff; font-family:inherit; font-size:1.25rem; font-weight:900; cursor:pointer; margin-bottom:12px; transition:all .18s; }
+    .play-btn:hover { transform:translateY(-2px); box-shadow:0 8px 28px rgba(245,158,11,.45); }
+    .text-link { text-align:center; color:var(--amber); font-size:.9rem; font-weight:700; cursor:pointer; }
+    .text-link:hover { text-decoration:underline; }
+
+    /* ── game ── */
+    .game-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+    .score-label { font-size:1.1rem; font-weight:900; color:var(--amber); }
+    .streak-badge { display:inline-block; background:#fef3c7; color:#b45309; border-radius:50px; padding:3px 10px; font-size:.8rem; font-weight:800; margin-top:3px; min-height:20px; }
+    .q-counter { font-size:.9rem; font-weight:700; color:#6b7280; }
+    .timer-wrap { position:relative; width:58px; height:58px; }
+    .timer-svg  { transform:rotate(-90deg); }
+    .t-bg   { fill:none; stroke:#f3f4f6; stroke-width:5; }
+    .t-fill { fill:none; stroke:var(--amber); stroke-width:5; stroke-linecap:round; transition:stroke-dashoffset 1s linear,stroke .3s; }
+    .t-fill.warn   { stroke:var(--orange); }
+    .t-fill.danger { stroke:var(--red); }
+    .timer-num { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:1.15rem; font-weight:900; color:#1f2937; }
+    .timer-num.danger { color:var(--red); }
+    .prog-wrap { background:#f3f4f6; border-radius:50px; height:8px; margin-bottom:18px; overflow:hidden; }
+    .prog-bar  { height:100%; background:linear-gradient(90deg,var(--amber),#d97706); border-radius:50px; transition:width .4s ease; }
+
+    /* scene box */
+    .scene-box { border-radius:20px; padding:18px 16px; text-align:center; margin-bottom:16px; min-height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; transition:background .3s; position:relative; }
+    .scene-visuals { font-size:1.6rem; line-height:1.6; }
+    .story-text    { font-size:1rem; font-weight:700; color:#1e3a5f; line-height:1.55; }
+    .speak-btn { position:absolute; top:8px; right:10px; background:rgba(255,255,255,.85); border:1.5px solid #e5e7eb; border-radius:50%; width:34px; height:34px; font-size:.9rem; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+    .speak-btn:hover { background:#fff; border-color:var(--amber); }
+    .speak-btn.speaking { animation:speakPulse .7s infinite; }
+    @keyframes speakPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.2)} }
+
+    .question-text { font-size:1.1rem; font-weight:800; color:#111827; text-align:center; margin-bottom:12px; line-height:1.5; }
+    .ans-grid { display:grid; grid-template-columns:1fr 1fr; gap:11px; margin-bottom:14px; }
+    .ans-btn { padding:18px 12px; border-radius:18px; border:3px solid #e5e7eb; background:#fff; font-family:inherit; font-size:1.1rem; font-weight:900; cursor:pointer; transition:all .18s; color:#1f2937; word-break:break-word; }
+    .ans-btn:hover:not(:disabled) { border-color:var(--amber); background:var(--amber-light); transform:scale(1.03); }
+    .ans-btn.correct { border-color:var(--green); background:#dcfce7; color:#14532d; animation:popGreen .45s; }
+    .ans-btn.wrong   { border-color:var(--red);   background:#fee2e2; color:#7f1d1d; animation:shake .4s; }
+    .ans-btn:disabled { cursor:default; }
+    .ans-btn.faded   { opacity:.28; }
+    @keyframes popGreen { 0%,100%{transform:scale(1)} 50%{transform:scale(1.06)} }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-7px)} 75%{transform:translateX(7px)} }
+    .hint-row { display:flex; justify-content:space-between; align-items:center; }
+    .hint-info { font-size:.85rem; font-weight:700; color:#9ca3af; }
+    .hint-btn  { background:#fff7ed; color:#c2410c; border:1.5px solid #fed7aa; padding:6px 14px; border-radius:50px; font-family:inherit; font-size:.82rem; font-weight:800; cursor:pointer; transition:all .15s; }
+    .hint-btn:hover:not(:disabled) { background:#ffedd5; }
+    .hint-btn:disabled { opacity:.4; cursor:default; }
+
+    /* ── feedback overlay ── */
+    .overlay { position:fixed; inset:0; background:rgba(0,0,0,.55); display:none; align-items:center; justify-content:center; z-index:200; padding:20px; }
+    .overlay.active { display:flex; }
+    .fb-box { background:#fff; border-radius:26px; padding:34px 28px; text-align:center; max-width:360px; width:100%; animation:popIn .3s; }
+    @keyframes popIn { from{transform:scale(.72);opacity:0} to{transform:scale(1);opacity:1} }
+    .fb-icon    { font-size:4rem; margin-bottom:10px; }
+    .fb-word-en { font-size:2rem; font-weight:900; color:#1e1b4b; margin-bottom:4px; }
+    .fb-word-zh { font-size:1.3rem; font-weight:800; color:#374151; margin-bottom:4px; }
+    .fb-zhuyin  { font-size:1rem; color:#d84315; font-weight:700; margin-bottom:12px; letter-spacing:.05em; }
+    .fb-expl    { font-size:.95rem; color:#4b5563; font-weight:600; line-height:1.55; margin-bottom:22px; }
+    .next-btn { padding:14px 32px; border-radius:50px; border:none; font-family:inherit; font-size:1.05rem; font-weight:800; cursor:pointer; color:#fff; transition:all .18s; }
+    .next-btn.ok { background:var(--green); }
+    .next-btn.oh { background:var(--orange); }
+    .next-btn:hover { transform:translateY(-2px); box-shadow:0 6px 18px rgba(0,0,0,.2); }
+
+    /* ── social share ── */
+    .share-wrap { margin:14px 0 6px; text-align:center; }
+    .share-label { font-size:.8rem; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:.06em; margin-bottom:8px; }
+    .share-row { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+    .share-btn { display:inline-flex; align-items:center; gap:6px; padding:8px 16px; border-radius:50px; border:none; font-family:inherit; font-size:.85rem; font-weight:800; cursor:pointer; text-decoration:none; color:#fff; transition:transform .15s,opacity .15s; }
+    .share-btn:hover { opacity:.88; transform:scale(1.05); }
+    .share-btn.sb-x    { background:#000; }
+    .share-btn.sb-fb   { background:#1877f2; }
+    .share-btn.sb-line { background:#00c300; }
+    .share-btn.sb-wa   { background:#25d366; }
+
+    /* ── results ── */
+    .results-center { text-align:center; margin-bottom:22px; }
+    .stars-row { font-size:3.2rem; margin-bottom:6px; }
+    .final-pts { font-size:3.2rem; font-weight:900; color:var(--amber); }
+    .final-sub { font-size:.9rem; color:#6b7280; font-weight:600; }
+    .stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:22px; }
+    .stat-box { background:#f9fafb; border-radius:16px; padding:16px 10px; text-align:center; }
+    .stat-val { font-size:1.8rem; font-weight:900; color:#111827; }
+    .stat-lbl { font-size:.78rem; font-weight:700; color:#9ca3af; margin-top:3px; }
+    .btn-col  { display:flex; flex-direction:column; gap:10px; }
+    .outline-btn { width:100%; padding:14px; border-radius:50px; border:2.5px solid var(--amber); background:#fff; color:var(--amber); font-family:inherit; font-size:1rem; font-weight:800; cursor:pointer; transition:all .18s; }
+    .outline-btn:hover { background:var(--amber-light); }
+
+    /* ── leaderboard ── */
+    .lb-header { display:flex; align-items:center; gap:12px; margin-bottom:18px; }
+    .back-btn  { background:#f3f4f6; border:none; border-radius:50%; width:38px; height:38px; font-size:1.2rem; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .15s; }
+    .back-btn:hover { background:#e5e7eb; }
+    .lb-title { font-size:1.55rem; font-weight:900; color:#1e1b4b; }
+    .lb-tabs { display:flex; gap:8px; margin-bottom:16px; }
+    .lb-tab  { flex:1; padding:9px 4px; border-radius:50px; border:2px solid #e5e7eb; background:#fff; font-family:inherit; font-size:.85rem; font-weight:800; cursor:pointer; transition:all .15s; }
+    .lb-tab:hover  { border-color:var(--amber); }
+    .lb-tab.active { background:var(--amber); color:#fff; border-color:var(--amber); }
+    .lb-list { list-style:none; max-height:340px; overflow-y:auto; }
+    .lb-item { display:flex; align-items:center; gap:10px; padding:11px 14px; border-radius:14px; margin-bottom:7px; background:#f9fafb; }
+    .lb-item.gold   { background:#fefce8; }
+    .lb-item.silver { background:#f8fafc; }
+    .lb-item.bronze { background:#fff7ed; }
+    .lb-item.me     { outline:2.5px solid var(--amber); }
+    .lb-rank { width:28px; font-size:1.1rem; font-weight:900; }
+    .lb-name { flex:1; font-weight:800; font-size:.95rem; color:#1f2937; }
+    .lb-theme { font-size:1.1rem; }
+    .lb-pts  { font-weight:900; color:var(--amber); font-size:.95rem; }
+    .lb-empty { text-align:center; color:#d1d5db; font-size:1rem; font-weight:700; padding:40px 0; }
+
+    /* ── animations ── */
+    .score-pop { position:absolute; font-size:1.6rem; font-weight:900; color:var(--green); pointer-events:none; animation:rise 1s ease-out forwards; z-index:100; }
+    @keyframes rise { 0%{opacity:1;transform:translateY(0)} 100%{opacity:0;transform:translateY(-60px)} }
+    .confetti { position:fixed; width:9px; height:9px; border-radius:2px; pointer-events:none; z-index:999; animation:fall linear forwards; }
+    @keyframes fall { 0%{opacity:1;transform:translateY(-20px) rotate(0deg)} 100%{opacity:0;transform:translateY(100vh) rotate(720deg)} }
+
+    @media (max-width:420px) {
+      .card { padding:20px 16px; }
+      .home-title { font-size:1.75rem; }
+      .ans-btn { font-size:.95rem; padding:14px 8px; }
+    }
+  </style>
+</head>
+<body>
+<div class="card" id="card">
+
+  <!-- persistent lang switch -->
+  <div class="lang-wrap">
+    <div class="lang-switch">
+      <button class="lang-btn" data-lang="en"    onclick="I18N.setLang('en')">EN</button>
+      <button class="lang-btn" data-lang="zh-tw" onclick="I18N.setLang('zh-tw')">中文</button>
+    </div>
+  </div>
+
+  <!-- HOME -->
+  <div class="screen active" id="s-home">
+    <div class="ticker"><span class="ticker-v" id="ticker-v">✈️</span></div>
+    <h1 class="home-title" data-i18n="appTitle">🌟 Word Adventure!</h1>
+    <p  class="home-sub"   data-i18n="subtitle">Fun word puzzles for young explorers ✨</p>
+    <input class="name-input" id="name-input" placeholder="What's your name?" maxlength="20" autocomplete="off">
+    <p class="label-row" data-i18n="chooseAdv">🗺️ Choose your adventure:</p>
+    <div class="theme-grid">
+      <div class="theme-card active" data-t="airline" onclick="pickTheme(this,'airline')">
+        <span class="big">✈️</span><span class="name" data-i18n="thAirline">Airline</span>
+      </div>
+      <div class="theme-card" data-t="bus" onclick="pickTheme(this,'bus')">
+        <span class="big">🚌</span><span class="name" data-i18n="thBus">Bus</span>
+      </div>
+      <div class="theme-card" data-t="ocean" onclick="pickTheme(this,'ocean')">
+        <span class="big">🌊</span><span class="name" data-i18n="thOcean">Ocean</span>
+      </div>
+    </div>
+    <p class="label-row" data-i18n="chooseDiff">🎯 Choose difficulty:</p>
+    <div class="diff-row">
+      <button class="diff-btn active" data-d="easy"   onclick="pickDiff(this,'easy')"   data-i18n="dEasy">🌱 Easy</button>
+      <button class="diff-btn"        data-d="medium" onclick="pickDiff(this,'medium')" data-i18n="dMedium">⭐ Medium</button>
+      <button class="diff-btn"        data-d="hard"   onclick="pickDiff(this,'hard')"   data-i18n="dHard">🔥 Hard</button>
+    </div>
+    <button class="play-btn" data-i18n="startBtn" onclick="startGame()">🚀 Start Adventure!</button>
+    <span class="text-link" data-i18n="lbLink" onclick="openLB()">🏆 View Leaderboard</span>
+  </div>
+
+  <!-- GAME -->
+  <div class="screen" id="s-game">
+    <div class="game-header">
+      <div>
+        <div class="score-label" id="g-score">⭐ 0 pts</div>
+        <div class="streak-badge" id="g-streak"></div>
+      </div>
+      <div class="q-counter" id="g-qnum">Q 1 / 5</div>
+      <div class="timer-wrap">
+        <svg class="timer-svg" viewBox="0 0 58 58" width="58" height="58">
+          <circle class="t-bg"   cx="29" cy="29" r="24"/>
+          <circle class="t-fill" cx="29" cy="29" r="24" id="t-arc" stroke-dasharray="150.8" stroke-dashoffset="0"/>
+        </svg>
+        <div class="timer-num" id="t-num">45</div>
+      </div>
+    </div>
+    <div class="prog-wrap"><div class="prog-bar" id="g-prog" style="width:20%"></div></div>
+    <div class="scene-box" id="g-scene">
+      <button class="speak-btn" id="speak-btn" onclick="speakQ()" title="Read aloud">🔊</button>
+      <div class="scene-visuals" id="g-visuals"></div>
+      <div class="story-text"   id="g-story"></div>
+    </div>
+    <div class="question-text" id="g-question"></div>
+    <div class="ans-grid">
+      <button class="ans-btn" id="a0" onclick="pick(0)"></button>
+      <button class="ans-btn" id="a1" onclick="pick(1)"></button>
+      <button class="ans-btn" id="a2" onclick="pick(2)"></button>
+      <button class="ans-btn" id="a3" onclick="pick(3)"></button>
+    </div>
+    <div class="hint-row">
+      <span class="hint-info" id="g-hint-info"></span>
+      <button class="hint-btn" id="g-hint-btn" data-i18n="hintBtn" onclick="useHint()">💡 50/50 Hint</button>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="screen" id="s-results">
+    <div class="results-center">
+      <div class="stars-row" id="r-stars"></div>
+      <div class="final-pts"  id="r-pts">0</div>
+      <div class="final-sub"  id="r-sub" data-i18n="ptsSuffix">points earned!</div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-box"><div class="stat-val" id="r-correct">0</div><div class="stat-lbl" data-i18n="statCorrect">Correct</div></div>
+      <div class="stat-box"><div class="stat-val" id="r-acc">0%</div><div class="stat-lbl" data-i18n="statAcc">Accuracy</div></div>
+      <div class="stat-box"><div class="stat-val" id="r-avg">0s</div><div class="stat-lbl" data-i18n="statTime">Avg Time</div></div>
+      <div class="stat-box"><div class="stat-val" id="r-streak">0</div><div class="stat-lbl" data-i18n="statStreak">Best Streak</div></div>
+    </div>
+    <div class="share-wrap">
+      <div class="share-label" data-i18n="shareLabel">Share your score</div>
+      <div class="share-row" id="share-row"></div>
+    </div>
+    <div class="btn-col">
+      <button class="play-btn"    data-i18n="playAgain"  onclick="startGame()">🔄 Play Again</button>
+      <button class="outline-btn" data-i18n="changeSet"  onclick="show('home')">🏠 Change Settings</button>
+      <span class="text-link" data-i18n="lbLink" onclick="openLB()" style="margin-top:4px">🏆 Leaderboard</span>
+    </div>
+  </div>
+
+  <!-- LEADERBOARD -->
+  <div class="screen" id="s-lb">
+    <div class="lb-header">
+      <button class="back-btn" onclick="show('home')">←</button>
+      <span class="lb-title" data-i18n="lbTitle">🏆 Leaderboard</span>
+    </div>
+    <div class="lb-tabs">
+      <button class="lb-tab active" data-i18n="dEasy"   onclick="lbTab(this,'easy')">🌱 Easy</button>
+      <button class="lb-tab"        data-i18n="dMedium" onclick="lbTab(this,'medium')">⭐ Medium</button>
+      <button class="lb-tab"        data-i18n="dHard"   onclick="lbTab(this,'hard')">🔥 Hard</button>
+    </div>
+    <ul class="lb-list" id="lb-list"></ul>
+  </div>
+</div>
+
+<!-- FEEDBACK OVERLAY -->
+<div class="overlay" id="overlay">
+  <div class="fb-box">
+    <div class="fb-icon"    id="fb-icon"></div>
+    <div class="fb-word-en" id="fb-word-en"></div>
+    <div class="fb-word-zh" id="fb-word-zh"></div>
+    <div class="fb-zhuyin"  id="fb-zhuyin"></div>
+    <div class="fb-expl"    id="fb-expl"></div>
+    <button class="next-btn" id="fb-btn" onclick="nextQ()">Next →</button>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════
+// ZH — Bopomofo annotator
+// ════════════════════════════════════════════════════
+(function () {
+  const CHARS = {
+    // ── code-quest-kids base ──
+    "程":"ㄔㄥˊ","式":"ㄕˋ","冒":"ㄇㄠˋ","險":"ㄒㄧㄢˇ","小":"ㄒㄧㄠˇ",
+    "高":"ㄍㄠ","手":"ㄕㄡˇ","怎":"ㄗㄣˇ","麼":"˙ㄇㄜ","玩":"ㄨㄢˊ",
+    "選":"ㄒㄩㄢˇ","一":"ㄧ","個":"ㄍㄜˋ","任":"ㄖㄣˋ","務":"ㄨˋ",
+    "家":"ㄐㄧㄚ","更":"ㄍㄥ","改":"ㄍㄞˇ","排":"ㄆㄞˊ","行":"ㄒㄧㄥˊ",
+    "榜":"ㄅㄤˇ","還":"ㄏㄞˊ","沒":"ㄇㄟˊ","有":"ㄧㄡˇ","分":"ㄈㄣ",
+    "數":"ㄕㄨˋ","當":"ㄉㄤ","第":"ㄉㄧˋ","位":"ㄨㄟˋ","英":"ㄧㄥ",
+    "雄":"ㄒㄩㄥˊ","吧":"˙ㄅㄚ","返":"ㄈㄢˇ","回":"ㄏㄨㄟˊ","執":"ㄓˊ",
+    "重":"ㄔㄨㄥˊ","來":"ㄌㄞˊ","積":"ㄐㄧ","木":"ㄇㄨˋ","點":"ㄉㄧㄢˇ",
+    "下":"ㄒㄧㄚˋ","把":"ㄅㄚˇ","它":"ㄊㄚ","加":"ㄐㄧㄚ","到":"ㄉㄠˋ",
+    "裡":"ㄌㄧˇ","我":"ㄨㄛˇ","的":"˙ㄉㄜ","全":"ㄑㄩㄢˊ","部":"ㄅㄨˋ",
+    "清":"ㄑㄧㄥ","除":"ㄔㄨˊ","你":"ㄋㄧˇ","名":"ㄇㄧㄥˊ","字":"ㄗˋ",
+    "是":"ㄕˋ","出":"ㄔㄨ","發":"ㄈㄚ","成":"ㄔㄥˊ","功":"ㄍㄨㄥ",
+    "了":"˙ㄌㄜ","得":"ㄉㄜˊ","再":"ㄗㄞˋ","次":"ㄘˋ","組":"ㄗㄨˇ",
+    "合":"ㄏㄜˊ","按":"ㄢˋ","讓":"ㄖㄤˋ","機":"ㄐㄧ","人":"ㄖㄣˊ",
+    "動":"ㄉㄨㄥˋ","起":"ㄑㄧˇ","抵":"ㄉㄧˇ","達":"ㄉㄚˊ","終":"ㄓㄨㄥ",
+    "就":"ㄐㄧㄡˋ","贏":"ㄧㄥˊ","用":"ㄩㄥˋ","越":"ㄩㄝˋ","少":"ㄕㄠˇ",
+    "多":"ㄉㄨㄛ","懂":"ㄉㄨㄥˇ","為":"ㄨㄟˋ","員":"ㄩㄢˊ","打":"ㄉㄚˇ",
+    "造":"ㄗㄠˋ","向":"ㄒㄧㄤˋ","前":"ㄑㄧㄢˊ","走":"ㄗㄡˇ","左":"ㄗㄨㄛˇ",
+    "轉":"ㄓㄨㄢˇ","右":"ㄧㄡˋ","複":"ㄈㄨˋ","在":"ㄗㄞˋ","這":"ㄓㄜˋ",
+    "先":"ㄒㄧㄢ","些":"ㄒㄧㄝ","好":"ㄏㄠˇ","可":"ㄎㄜˇ","使":"ㄕˇ",
+    "步":"ㄅㄨˋ","旗":"ㄑㄧˊ","子":"˙ㄗ","彎":"ㄨㄢ","身":"ㄕㄣ",
+    "角":"ㄐㄧㄠˇ","繞":"ㄖㄠˋ","過":"ㄍㄨㄛˋ","路":"ㄌㄨˋ","力":"ㄌㄧˋ",
+    "量":"ㄌㄧㄤˋ","遠":"ㄩㄢˇ","精":"ㄐㄧㄥ","通":"ㄊㄨㄥ","與":"ㄩˇ",
+    "關":"ㄍㄨㄢ","卡":"ㄎㄚˇ","工":"ㄍㄨㄥ","具":"ㄐㄩˋ","然":"ㄖㄢˊ",
+    "後":"ㄏㄡˋ","格":"ㄍㄜˊ","面":"ㄇㄧㄢˋ","能":"ㄋㄥˊ","目":"ㄇㄨˋ",
+    "標":"ㄅㄧㄠ","拿":"ㄋㄚˊ","自":"ㄗˋ","提":"ㄊㄧˊ","示":"ㄕˋ",
+    "做":"ㄗㄨㄛˋ","看":"ㄎㄢˋ","老":"ㄌㄠˇ","師":"ㄕ","新":"ㄒㄧㄣ",
+    "增":"ㄗㄥ","請":"ㄑㄧㄥˇ","放":"ㄈㄤˋ","上":"ㄕㄤˋ","和":"ㄏㄜˊ",
+    "最":"ㄗㄨㄟˋ","佳":"ㄐㄧㄚ","解":"ㄐㄧㄝˇ","需":"ㄒㄩ","要":"ㄧㄠˋ",
+    "中":"ㄓㄨㄥ","文":"ㄨㄣˊ","單":"ㄉㄢ","完":"ㄨㄢˊ","大":"ㄉㄚˋ",
+    "已":"ㄧˇ","不":"ㄅㄨˋ","三":"ㄙㄢ","之":"ㄓ","城":"ㄔㄥˊ","市":"ㄕˋ",
+    "方":"ㄈㄤ","形":"ㄒㄧㄥˊ","接":"ㄐㄧㄝ","六":"ㄌㄧㄡˋ","節":"ㄐㄧㄝˊ",
+    "長":"ㄔㄤˊ","空":"ㄎㄨㄥ","乘":"ㄔㄥˊ","算":"ㄙㄨㄢˋ","二":"ㄦˋ",
+    "錢":"ㄑㄧㄢˊ","便":"ㄆㄧㄢˊ","宜":"ㄧˊ","極":"ㄐㄧˊ",
+    // ── bus/cargo from cqk ──
+    "公":"ㄍㄨㄥ","車":"ㄔㄜ","燈":"ㄉㄥ","光":"ㄍㄨㄤ","班":"ㄅㄢ",
+    "開":"ㄎㄞ","站":"ㄓㄢˋ","兩":"ㄌㄧㄤˇ","牌":"ㄆㄞˊ","載":"ㄗㄞˋ",
+    "客":"ㄎㄜˋ","線":"ㄒㄧㄢˋ","每":"ㄇㄟˇ","換":"ㄏㄨㄢˋ","顏":"ㄧㄢˊ",
+    "色":"ㄙㄜˋ","紅":"ㄏㄨㄥˊ","綠":"ㄌㄩˋ","黃":"ㄏㄨㄤˊ","號":"ㄏㄠˋ",
+    "對":"ㄉㄨㄟˋ","並":"ㄅㄧㄥˋ","他":"ㄊㄚ","始":"ㄕˇ",
+    "裝":"ㄓㄨㄤ","廠":"ㄔㄤˇ","輪":"ㄌㄨㄣˊ","四":"ㄙˋ","飛":"ㄈㄟ",
+    "架":"ㄐㄧㄚˋ","火":"ㄏㄨㄛˇ","零":"ㄌㄧㄥˊ","件":"ㄐㄧㄢˋ",
+    "海":"ㄏㄞˇ","洋":"ㄧㄤˊ","條":"ㄊㄧㄠˊ","魚":"ㄩˊ","游":"ㄧㄡˊ",
+    "吃":"ㄔ","都":"ㄉㄡ","群":"ㄑㄩㄣˊ","去":"ㄑㄩˋ",
+    "貨":"ㄏㄨㄛˋ","運":"ㄩㄣˋ","戰":"ㄓㄢˋ","送":"ㄙㄨㄥˋ",
+    "只":"ㄓˇ","價":"ㄐㄧㄚˋ","值":"ㄓˊ","箱":"ㄒㄧㄤ","滿":"ㄇㄢˇ",
+    "輕":"ㄑㄧㄥ","也":"ㄧㄝˇ","別":"ㄅㄧㄝˊ","寶":"ㄅㄠˇ","物":"ㄨˋ",
+    "太":"ㄊㄞˋ","夠":"ㄍㄡˋ","帶":"ㄉㄞˋ","限":"ㄒㄧㄢˋ","制":"ㄓˋ",
+    "內":"ㄋㄟˋ","主":"ㄓㄨˇ","題":"ㄊㄧˊ","同":"ㄊㄨㄥˊ",
+    // ── math-adventure additions ──
+    "學":"ㄒㄩㄝˊ","探":"ㄊㄢˋ","趣":"ㄑㄩˋ","難":"ㄋㄢˊ","度":"ㄉㄨˋ",
+    "普":"ㄆㄨˇ","困":"ㄎㄨㄣˋ","簡":"ㄐㄧㄢˇ","航":"ㄏㄤˊ",
+    "薩":"ㄙㄚˋ","拉":"ㄌㄚ","登":"ㄉㄥ","口":"ㄎㄡˇ",
+    "共":"ㄍㄨㄥˋ","幾":"ㄐㄧˇ","李":"ㄌㄧˇ","頭":"ㄊㄡˊ","等":"ㄉㄥˇ",
+    "艙":"ㄘㄤ","經":"ㄐㄧㄥ","濟":"ㄐㄧˋ","落":"ㄌㄨㄛˋ","降":"ㄐㄧㄤˋ",
+    "麥":"ㄇㄞˋ","克":"ㄎㄜˋ","庫":"ㄎㄨˋ","倉":"ㄘㄤ","斤":"ㄐㄧㄣ",
+    "費":"ㄈㄟˋ","配":"ㄆㄟˋ","蘿":"ㄌㄨㄛˊ","莎":"ㄕㄚ","司":"ㄙ",
+    "票":"ㄆㄧㄠˋ","里":"ㄌㄧˇ","速":"ㄙㄨˋ","正":"ㄓㄥˋ","確":"ㄑㄩㄝˋ",
+    "率":"ㄌㄩˋ","均":"ㄐㄩㄣ","平":"ㄆㄧㄥˊ","連":"ㄌㄧㄢˊ","勝":"ㄕㄥˋ",
+    "設":"ㄕㄜˋ","定":"ㄉㄧㄥˋ","超":"ㄔㄠ","級":"ㄐㄧˊ","棒":"ㄅㄤˋ",
+    "繼":"ㄐㄧˋ","續":"ㄒㄩˋ","油":"ㄧㄡˊ","答":"ㄉㄚˊ","現":"ㄒㄧㄢˋ",
+    "總":"ㄗㄨㄥˇ","座":"ㄗㄨㄛˋ","今":"ㄐㄧㄣ","天":"ㄊㄧㄢ","又":"ㄧㄡˋ",
+    "台":"ㄊㄞˊ","批":"ㄆㄧ","包":"ㄅㄠ","裹":"ㄍㄨㄛˇ","損":"ㄙㄨㄣˇ",
+    "壞":"ㄏㄨㄞˋ","退":"ㄊㄨㄟˋ","其":"ㄑㄧˊ","停":"ㄊㄧㄥˊ","靠":"ㄎㄠˋ",
+    "波":"ㄅㄛ","音":"ㄧㄣ","約":"ㄩㄝ","跑":"ㄆㄠˇ","棧":"ㄓㄢˋ",
+    "板":"ㄅㄢˇ","月":"ㄩㄝˋ","賺":"ㄓㄨㄢˋ","峰":"ㄈㄥ",
+    "距":"ㄐㄩˋ","離":"ㄌㄧˊ","朵":"ㄉㄨㄛˇ","錯":"ㄘㄨㄛˋ",
+    "際":"ㄐㄧˋ","國":"ㄍㄨㄛˊ",
+    "比":"ㄅㄧˇ","時":"ㄕˊ","間":"ㄐㄧㄢ",
+    "剩":"ㄕㄥˋ","收":"ㄕㄡ","入":"ㄖㄨˋ","計":"ㄐㄧˋ",
+    // ── word-adventure additions ──
+    "翼":"ㄧˋ","翅":"ㄔˋ","道":"ㄉㄠˋ",
+    "護":"ㄏㄨˋ","照":"ㄓㄠˋ","雲":"ㄩㄣˊ","醒":"ㄒㄧㄥˇ",
+    "牆":"ㄑㄧㄤˊ","水":"ㄕㄨㄟˇ","窗":"ㄔㄨㄤ","戶":"ㄏㄨˋ","滾":"ㄍㄨㄣˇ",
+    "表":"ㄅㄧㄠˇ","程":"ㄔㄥˊ","結":"ㄐㄧㄝˊ",
+    "束":"ㄅㄨˋ","珊":"ㄕㄢ","瑚":"ㄏㄨˊ","礁":"ㄐㄧㄠ","鯊":"ㄕㄚ","錨":"ㄇㄠˊ",
+    "潛":"ㄑㄧㄢˊ","艇":"ㄊㄧㄥˇ","港":"ㄍㄤˇ","豚":"ㄊㄨㄣˊ","塔":"ㄊㄚˇ",
+    "安":"ㄢ","帶":"ㄉㄞˋ","廊":"ㄌㄤˊ",
+    "引":"ㄧㄣˇ","擎":"ㄑㄧㄥˊ","煙":"ㄧㄢ","信":"ㄒㄧㄣˋ","夾":"ㄐㄧㄚˊ",
+    "徽":"ㄏㄨㄟ","章":"ㄓㄤ","軌":"ㄍㄨㄟˇ","徑":"ㄐㄧㄥˋ",
+    "橋":"ㄑㄧㄠˊ","誌":"ㄓˋ","燈":"ㄉㄥ",
+    "台":"ㄊㄞˊ","階":"ㄐㄧㄝ","鏡":"ㄐㄧㄥˋ",
+    "螢":"ㄧㄥˊ","軸":"ㄓㄡˊ","胎":"ㄊㄞ",
+    "曆":"ㄌㄧˋ","列":"ㄌㄧㄝˋ","勤":"ㄑㄧㄣˊ","遊":"ㄧㄡˊ",
+    "址":"ㄓˇ","卸":"ㄒㄧㄝˋ",
+    "鉤":"ㄍㄡ","鍊":"ㄌㄧㄢˋ","繩":"ㄕㄥˊ","藻":"ㄗㄠˇ","布":"ㄅㄨˋ",
+    "岩":"ㄧㄢˊ","岸":"ㄢˋ","指":"ㄓˇ","揮":"ㄏㄨㄟ",
+    "哺":"ㄅㄨˇ","乳":"ㄖㄨˇ","碼":"ㄇㄚˇ",
+    "雷":"ㄌㄟˊ","艦":"ㄐㄧㄢˋ","冷":"ㄌㄥˇ","深":"ㄕㄣ","浪":"ㄌㄤˋ",
+    "漁":"ㄩˊ","警":"ㄐㄧㄥˇ","告":"ㄍㄠˋ",
+    "灣":"ㄨㄢ","穿":"ㄔㄨㄢ",
+    "蓬":"ㄆㄥˊ","鬆":"ㄙㄨㄥ","氣":"ㄑㄧˋ","顆":"ㄎㄜ","粒":"ㄌㄧˋ",
+    "細":"ㄒㄧˋ","鱗":"ㄌㄧㄣˊ","片":"ㄆㄧㄢˋ",
+    "彩":"ㄘㄞˇ","繽":"ㄅㄧㄣ","紛":"ㄈㄣ","躲":"ㄉㄨㄛˇ","躍":"ㄩㄝˋ",
+    "粼":"ㄌㄧㄣˊ","固":"ㄍㄨˋ","場":"ㄔㄤˊ",
+    "界":"ㄐㄧㄝˋ","球":"ㄑㄧㄡˊ","萬":"ㄨㄢˋ",
+    "皮":"ㄆㄧˊ","幫":"ㄅㄤ","助":"ㄓㄨˋ","衛":"ㄨㄟˋ",
+    "守":"ㄕㄡˇ","終":"ㄓㄨㄥ","點":"ㄉㄧㄢˇ","廈":"ㄒㄧㄚˋ","置":"ㄓˋ",
+    "棉":"ㄇㄧㄢˊ","廣":"ㄍㄨㄤˇ","扁":"ㄅㄧㄢˇ",
+    "邊":"ㄅㄧㄢ","境":"ㄐㄧㄥˋ","本":"ㄅㄣˇ",
+    "旅":"ㄌㄩˇ","十":"ㄕˊ","鐘":"ㄓㄨㄥ","宣":"ㄒㄩㄢ",
+    "沿":"ㄧㄢˊ","條":"ㄊㄧㄠˊ","起":"ㄑㄧˇ","服":"ㄈㄨˊ","肚":"ㄉㄨˋ",
+    "查":"ㄔㄚˊ","板":"ㄅㄢˇ","航":"ㄏㄤˊ","離":"ㄌㄧˊ",
+    "熱":"ㄖㄜˋ","带":"ㄉㄞˋ","鹹":"ㄒㄧㄢˊ","礁":"ㄐㄧㄠ",
+    "推":"ㄊㄨㄟ","波":"ㄅㄛ","沙":"ㄕㄚ","灘":"ㄊㄢ","珊":"ㄕㄢ",
+    "捲":"ㄐㄩㄢˇ","帶":"ㄉㄞˋ","防":"ㄈㄤˊ","漂":"ㄆㄧㄠ","移":"ㄧˊ",
+    "滑":"ㄏㄨㄚˊ","悄":"ㄑㄧㄠ","靜":"ㄐㄧㄥˋ","閃":"ㄕㄢˇ","亮":"ㄌㄧㄤˋ",
+    "聰":"ㄘㄨㄥ","明":"ㄇㄧㄥˊ","愛":"ㄞˋ","哺":"ㄅㄨˇ","乳":"ㄖㄨˇ",
+    "鋒":"ㄈㄥ","利":"ㄌㄧˋ","牙":"ㄧㄚˊ","齒":"ㄔˇ","強":"ㄑㄧㄤˊ",
+    "大":"ㄉㄚˋ","型":"ㄒㄧㄥˊ","種":"ㄓㄨㄥˇ","類":"ㄌㄟˋ","地":"ㄉㄧˋ",
+    "球":"ㄑㄧㄡˊ","最":"ㄗㄨㄟˋ","水":"ㄕㄨㄟˇ","域":"ㄩˋ",
+    "工":"ㄍㄨㄥ","航":"ㄏㄤˊ","行":"ㄒㄧㄥˊ","固":"ㄍㄨˋ","定":"ㄉㄧㄥˋ",
+    "停":"ㄊㄧㄥˊ","靠":"ㄎㄠˋ","冰":"ㄅㄧㄥ","波":"ㄅㄛ","潛":"ㄑㄧㄢˊ",
+    "水":"ㄕㄨㄟˇ","進":"ㄐㄧㄣˋ","行":"ㄒㄧㄥˊ","船":"ㄔㄨㄢˊ","隻":"ㄓ",
+    "驅":"ㄑㄩ","逐":"ㄓㄨˊ","漂":"ㄆㄧㄠ","移":"ㄧˊ","魚":"ㄩˊ",
+    "獵":"ㄌㄧㄝˋ","爪":"ㄓㄠˇ","物":"ㄨˋ","品":"ㄆㄧㄣˇ","軍":"ㄐㄩㄣ",
+    "指":"ㄓˇ","揮":"ㄏㄨㄟ","整":"ㄓㄥˇ","艘":"ㄙㄡ","員":"ㄩㄢˊ",
+  };
+
+  const PHRASES = {
+    "排行":["ㄆㄞˊ","ㄏㄤˊ"],
+    "機長":["ㄐㄧ","ㄓㄤˇ"],
+    "空位":["ㄎㄨㄥˋ","ㄨㄟˋ"],
+    "重量":["ㄓㄨㄥˋ","ㄌㄧㄤˋ"],
+    "重的":["ㄓㄨㄥˋ","˙ㄉㄜ"],
+    "更多":["ㄍㄥˋ","ㄉㄨㄛ"],
+    "更遠":["ㄍㄥˋ","ㄩㄢˇ"],
+    "船長":["ㄔㄨㄢˊ","ㄓㄤˇ"],
+    "行李":["ㄒㄧㄥˊ","ㄌㄧˇ"],
+    "出發":["ㄔㄨ","ㄈㄚ"],
+    "一起":["ㄧˋ","ㄑㄧˇ"],
+  };
+
+  const TONE = {"ˊ":1,"ˇ":1,"ˋ":1,"˙":1};
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g,c=>
+      ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  }
+  function isHan(ch) { const c=ch.codePointAt(0); return c>=0x4e00&&c<=0x9fff; }
+  function ruby(ch,zh) {
+    let base=zh,tone="",neutral=false;
+    if(zh[0]==="˙"){neutral=true;tone="˙";base=zh.slice(1);}
+    else{const l=zh[zh.length-1];if(TONE[l]){tone=l;base=zh.slice(0,-1);}}
+    const bs=`<span class="zy-b">${esc(base)}</span>`;
+    let cl;
+    if(neutral)cl=`<span class="zy-z zy-neu"><span class="zy-t">${esc(tone)}</span>${bs}</span>`;
+    else if(tone)cl=`<span class="zy-z">${bs}<span class="zy-t">${esc(tone)}</span></span>`;
+    else cl=`<span class="zy-z">${bs}</span>`;
+    return `<span class="zy"><span class="zy-c">${esc(ch)}</span>${cl}</span>`;
+  }
+  function annotate(str) {
+    let out="",i=0;
+    while(i<str.length){
+      if(str[i]==="<"){
+        const end=str.indexOf(">",i);
+        if(end!==-1){out+=str.slice(i,end+1);i=end+1;continue;}
+      }
+      let matched=false;
+      for(let len=4;len>=2;len--){
+        const sub=str.substr(i,len);
+        if(PHRASES[sub]){
+          for(let k=0;k<sub.length;k++)out+=ruby(sub[k],PHRASES[sub][k]);
+          i+=len;matched=true;break;
+        }
+      }
+      if(matched)continue;
+      const ch=str[i];
+      if(isHan(ch)&&CHARS[ch])out+=ruby(ch,CHARS[ch]);
+      else out+=esc(ch);
+      i++;
+    }
+    return out;
+  }
+  window.ZH={annotate,esc,CHARS,PHRASES};
+})();
+
+// ════════════════════════════════════════════════════
+// I18N
+// ════════════════════════════════════════════════════
+const I18N=(function(){
+  const S={
+    en:{
+      appTitle:"🌟 Word Adventure!",
+      subtitle:"Fun word puzzles for young explorers ✨",
+      namePH:"What's your name?",
+      chooseAdv:"🗺️ Choose your adventure:",
+      chooseDiff:"🎯 Choose difficulty:",
+      dEasy:"🌱 Easy",dMedium:"⭐ Medium",dHard:"🔥 Hard",
+      thAirline:"Airline",thBus:"Bus",thOcean:"Ocean",
+      startBtn:"🚀 Start Adventure!",
+      lbLink:"🏆 View Leaderboard",
+      hintBtn:"💡 50/50 Hint",
+      ptsLabel:"pts",
+      ptsSuffix:"points earned!",
+      qPrompt:"Which word fits the blank?",
+      statCorrect:"Correct",statAcc:"Accuracy",statTime:"Avg Time",statStreak:"Best Streak",
+      playAgain:"🔄 Play Again",changeSet:"🏠 Change Settings",
+      lbTitle:"🏆 Leaderboard",
+      lbEmpty:"No scores yet — be the first! 🚀",
+      noName:"⚠️ Enter your name first!",
+      keepGoing:"Keep Going! →",understand:"I understand →",seeResults:"🏁 See Results!",
+      wrong:"Not quite…",timeout:"Time's Up!",
+      shareLabel:"Share your score",
+      shareTpl:"I scored {score} pts on Word Adventure ({diff})! 🌟 Can you beat me?",
+    },
+    "zh-tw":{
+      appTitle:"🌟 單字大冒險！",
+      subtitle:"小探險家的有趣單字題 ✨",
+      namePH:"你的名字是？",
+      chooseAdv:"🗺️ 選一個冒險：",
+      chooseDiff:"🎯 選難度：",
+      dEasy:"🌱 簡單",dMedium:"⭐ 普通",dHard:"🔥 困難",
+      thAirline:"航空",thBus:"公車",thOcean:"海洋",
+      startBtn:"🚀 開始冒險！",
+      lbLink:"🏆 排行榜",
+      hintBtn:"💡 五五開提示",
+      ptsLabel:"分",
+      ptsSuffix:"分，很棒！",
+      qPrompt:"哪個單字填入空格？",
+      statCorrect:"答對",statAcc:"正確率",statTime:"平均秒數",statStreak:"最長連勝",
+      playAgain:"🔄 再玩一次",changeSet:"🏠 更改設定",
+      lbTitle:"🏆 排行榜",
+      lbEmpty:"還沒有分數 — 成為第一名吧！🚀",
+      noName:"⚠️ 請先輸入名字！",
+      keepGoing:"繼續 →",understand:"我知道了 →",seeResults:"🏁 看結果！",
+      wrong:"再想想看…",timeout:"時間到了！",
+      shareLabel:"分享你的分數",
+      shareTpl:"我在單字大冒險（{diff}）得了 {score} 分！🌟 來挑戰我吧！",
+    },
+  };
+  const CHEERS={
+    en:["Great job! 🎉","Awesome! 🌟","Correct! 💪","Brilliant! 🧠","You got it! 🎯","Spot on! ✨"],
+    "zh-tw":["太棒了！🎉","好厲害！🌟","答對了！💪","超聰明！🧠","就是這樣！🎯","完全正確！✨"],
+  };
+  let _lang="en";
+  const _cbs=[];
+
+  function t(k){ return (S[_lang]&&S[_lang][k])||S.en[k]||k; }
+
+  function apply(){
+    document.documentElement.lang=_lang;
+    document.body.classList.toggle("zh",_lang==="zh-tw");
+    const zh=_lang==="zh-tw";
+    document.querySelectorAll("[data-i18n]").forEach(el=>{
+      const key=el.getAttribute("data-i18n");
+      const str=t(key);
+      if(zh&&window.ZH)el.innerHTML=ZH.annotate(str);
+      else el.textContent=str;
+    });
+    document.querySelectorAll(".lang-btn").forEach(b=>
+      b.classList.toggle("active",b.dataset.lang===_lang));
+    const inp=document.getElementById("name-input");
+    if(inp)inp.placeholder=t("namePH");
+    _cbs.forEach(fn=>fn(_lang));
+  }
+
+  return{
+    get lang(){return _lang;},
+    t,apply,
+    cheer(){const a=CHEERS[_lang]||CHEERS.en;return a[Math.floor(Math.random()*a.length)];},
+    setLang(l){if(!S[l])return;_lang=l;localStorage.setItem("wa_lang",l);apply();},
+    init(){
+      const sv=localStorage.getItem("wa_lang");
+      const br=(navigator.language||"en").toLowerCase();
+      _lang=sv||(br.startsWith("zh")?"zh-tw":"en");
+      apply();
+    },
+    onChange(fn){_cbs.push(fn);},
+  };
+})();
+
+// ════════════════════════════════════════════════════
+// SPEECH
+// ════════════════════════════════════════════════════
+function stripHtml(s){return s.replace(/<[^>]+>/g,"");}
+function pickVoice(lang){
+  const voices=window.speechSynthesis.getVoices();
+  if(!voices.length)return null;
+  const zh=lang==="zh-TW";
+  const prefs=zh
+    ?["Meijia","Tingting","zh-TW","zh_TW","Chinese (Traditional)"]
+    :["Samantha","Karen","Moira","Daniel","en-US","en_US","English"];
+  for(const p of prefs){
+    const v=voices.find(v=>v.name.includes(p)||v.lang===p);
+    if(v)return v;
+  }
+  return voices.find(v=>v.lang.startsWith(zh?"zh":"en"))||null;
+}
+function speak(text){
+  if(!window.speechSynthesis||!text.trim())return;
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  const lang=I18N.lang==="zh-tw"?"zh-TW":"en-US";
+  u.lang=lang;
+  u.rate=0.9; u.pitch=1.0;
+  const v=pickVoice(lang);
+  if(v)u.voice=v;
+  const btn=document.getElementById("speak-btn");
+  if(btn)btn.classList.add("speaking");
+  u.onend=u.onerror=()=>btn&&btn.classList.remove("speaking");
+  window.speechSynthesis.speak(u);
+}
+function speakQ(){
+  const q=GS.qs&&GS.qs[GS.qi];
+  if(!q)return;
+  const zh=I18N.lang==="zh-tw";
+  const text=stripHtml(zh?q.s_zh:q.s_en).replace("___","blank");
+  speak(text);
+}
+
+// ════════════════════════════════════════════════════
+// CONFIG
+// ════════════════════════════════════════════════════
+const THEMES={
+  airline:{emoji:"✈️",vehicle:"✈️",bg:"linear-gradient(135deg,#e0f2fe,#bae6fd)"},
+  bus:    {emoji:"🚌",vehicle:"🚌",bg:"linear-gradient(135deg,#dcfce7,#86efac)"},
+  ocean:  {emoji:"🌊",vehicle:"🌊",bg:"linear-gradient(135deg,#cffafe,#67e8f9)"},
+};
+const DIFFS={easy:{secs:45},medium:{secs:35},hard:{secs:28}};
+const TOTAL=5;
+
+// ════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════
+let GS={
+  name:"",theme:"airline",diff:"easy",
+  qs:[],qi:0,score:0,streak:0,best:0,
+  hints:2,correct:0,timeSum:0,
+  timer:null,t:0,answered:false,
+};
+
+// ════════════════════════════════════════════════════
+// UTILS
+// ════════════════════════════════════════════════════
+const r=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+function shuffle(a){
+  const arr=[...a];
+  for(let i=arr.length-1;i>0;i--){const j=r(0,i);[arr[i],arr[j]]=[arr[j],arr[i]];}
+  return arr;
+}
+
+// ════════════════════════════════════════════════════
+// WORD BANKS
+// ════════════════════════════════════════════════════
+
+// ── AIRLINE ──
+const QA={
+  easy:[
+    {emoji:"✈️", word_en:"fly",    word_zh:"飛",     word_zhuyin:"ㄈㄟ",             s_en:"Planes ___ high above the clouds.", s_zh:"飛機可以在雲端上方高高地___。", e_en:"FLY — planes and birds can fly through the sky! ✈️", e_zh:"飛（fly）— 飛機和鳥都可以在天空中飛！✈️", dist_en:["run","swim","jump"],   dist_zh:["跑","游泳","跳"]},
+    {emoji:"🌤️", word_en:"sky",    word_zh:"天空",   word_zhuyin:"ㄊㄧㄢ ㄎㄨㄥ",   s_en:"Clouds float in the blue ___.",   s_zh:"白雲飄浮在藍色的___裡。",   e_en:"SKY — the blue space above us where planes fly! 🌤️", e_zh:"天空（sky）— 飛機飛翔的藍色空間！🌤️", dist_en:["sea","land","road"],  dist_zh:["海","陸地","道路"]},
+    {emoji:"💺", word_en:"seat",   word_zh:"座位",   word_zhuyin:"ㄗㄨㄛˋ ㄨㄟˋ",   s_en:"Find your ___ and buckle your belt.", s_zh:"找到你的___並繫好安全帶。", e_en:"SEAT — where you sit on the airplane! 💺", e_zh:"座位（seat）— 你在飛機上坐的地方！💺", dist_en:["belt","bag","door"],  dist_zh:["安全帶","袋子","門"]},
+    {emoji:"🛫", word_en:"wing",   word_zh:"機翼",   word_zhuyin:"ㄐㄧ ㄧˋ",         s_en:"Each side of the plane has a ___.", s_zh:"飛機每一側都有一個___。",   e_en:"WING — the flat part that helps the plane fly! 🛫", e_zh:"機翼（wing）— 幫助飛機飛行的扁平部分！🛫", dist_en:["tail","nose","door"],  dist_zh:["尾翼","機頭","門"]},
+    {emoji:"🚪", word_en:"gate",   word_zh:"登機門", word_zhuyin:"ㄉㄥ ㄐㄧ ㄇㄣˊ", s_en:"Board the plane at ___ number 5.", s_zh:"請在5號___登機。",           e_en:"GATE — where you wait and board your flight! 🚪", e_zh:"登機門（gate）— 你等候並登機的地方！🚪", dist_en:["door","hall","exit"],  dist_zh:["門","走廊","出口"]},
+  ],
+  medium:[
+    {emoji:"👨‍✈️", word_en:"pilot",   word_zh:"飛行員", word_zhuyin:"ㄈㄟ ㄒㄧㄥˊ ㄩㄢˊ", s_en:"The ___ steers the airplane through the sky.", s_zh:"___駕駛飛機穿越天空。", e_en:"PILOT — the person who flies the airplane! 👨‍✈️", e_zh:"飛行員（pilot）— 駕駛飛機的人！👨‍✈️", dist_en:["driver","sailor","worker"],  dist_zh:["司機","水手","工人"]},
+    {emoji:"☁️", word_en:"cloud",   word_zh:"雲",     word_zhuyin:"ㄩㄣˊ",             s_en:"The plane flew right through the white ___.", s_zh:"飛機穿過白色的___。", e_en:"CLOUD — white fluffy water in the sky! ☁️", e_zh:"雲（cloud）— 天空中白色蓬鬆的水氣！☁️", dist_en:["smoke","storm","wind"],  dist_zh:["煙","暴風雨","風"]},
+    {emoji:"🎫", word_en:"ticket",  word_zh:"機票",   word_zhuyin:"ㄐㄧ ㄆㄧㄠˋ",     s_en:"Show your ___ to the flight attendant.", s_zh:"把你的___出示給空服員看。", e_en:"TICKET — the pass that lets you board a plane! 🎫", e_zh:"機票（ticket）— 讓你登機的票！🎫", dist_en:["letter","wallet","badge"],  dist_zh:["信","皮夾","徽章"]},
+    {emoji:"📦", word_en:"cargo",   word_zh:"貨物",   word_zhuyin:"ㄏㄨㄛˋ ㄨˋ",       s_en:"The plane carries ___ in its belly.", s_zh:"飛機的機腹裡裝著___。", e_en:"CARGO — goods and packages carried by a plane! 📦", e_zh:"貨物（cargo）— 飛機運載的貨品和包裹！📦", dist_en:["people","luggage","food"],  dist_zh:["人","行李","食物"]},
+    {emoji:"🛋️", word_en:"cabin",   word_zh:"客艙",   word_zhuyin:"ㄎㄜˋ ㄘㄤ",        s_en:"Passengers sit in the ___ during the flight.", s_zh:"乘客在飛行途中坐在___裡。", e_en:"CABIN — the passenger area inside the airplane! 🛋️", e_zh:"客艙（cabin）— 飛機內的乘客區域！🛋️", dist_en:["cockpit","engine","cargo"],  dist_zh:["駕駛艙","引擎","貨艙"]},
+  ],
+  hard:[
+    {emoji:"🛂", word_en:"passport", word_zh:"護照",  word_zhuyin:"ㄏㄨˋ ㄓㄠˋ",      s_en:"You must show your ___ at the border.", s_zh:"你必須在邊境出示你的___。", e_en:"PASSPORT — the booklet you need to travel abroad! 🛂", e_zh:"護照（passport）— 出國旅行需要的小本子！🛂", dist_en:["ticket","license","boarding"],  dist_zh:["票","執照","登機牌"]},
+    {emoji:"🧳", word_en:"luggage",  word_zh:"行李",  word_zhuyin:"ㄒㄧㄥˊ ㄌㄧˇ",    s_en:"Stow your ___ in the overhead bin.", s_zh:"把你的___放進頭頂的置物箱。", e_en:"LUGGAGE — your bags and suitcases when travelling! 🧳", e_zh:"行李（luggage）— 旅行時的袋子和行李箱！🧳", dist_en:["cargo","package","item"],  dist_zh:["貨物","包裹","物品"]},
+    {emoji:"🎖️", word_en:"captain", word_zh:"機長",  word_zhuyin:"ㄐㄧ ㄓㄤˇ",       s_en:"The ___ announced we would land in ten minutes.", s_zh:"___宣布我們將在十分鐘後降落。", e_en:"CAPTAIN — the pilot in charge of the whole flight! 🎖️", e_zh:"機長（captain）— 負責整個航班的飛行員！🎖️", dist_en:["pilot","officer","engineer"],  dist_zh:["飛行員","官員","工程師"]},
+    {emoji:"🛫", word_en:"runway",   word_zh:"跑道",  word_zhuyin:"ㄆㄠˇ ㄉㄠˋ",      s_en:"The plane gathered speed down the long ___.", s_zh:"飛機沿著長長的___加速。", e_en:"RUNWAY — the long strip where planes take off and land! 🛫", e_zh:"跑道（runway）— 飛機起降的長條地帶！🛫", dist_en:["highway","taxiway","pathway"],  dist_zh:["公路","滑行道","小路"]},
+    {emoji:"🕐", word_en:"departure", word_zh:"出發", word_zhuyin:"ㄔㄨ ㄈㄚ",        s_en:"Check the board for the ___ time of your flight.", s_zh:"查看看板上航班的___時間。", e_en:"DEPARTURE — the time your flight leaves! 🕐", e_zh:"出發（departure）— 你的航班離開的時間！🕐", dist_en:["arrival","schedule","terminal"],  dist_zh:["到達","時刻表","航廈"]},
+  ],
+};
+
+// ── BUS ──
+const QB={
+  easy:[
+    {emoji:"🚌", word_en:"bus",    word_zh:"公車",  word_zhuyin:"ㄍㄨㄥ ㄔㄜ",     s_en:"We ride the ___ to school every morning.", s_zh:"我們每天早上坐___上學。", e_en:"BUS — a big vehicle that carries many passengers! 🚌", e_zh:"公車（bus）— 載很多乘客的大型車輛！🚌", dist_en:["car","train","bike"],   dist_zh:["汽車","火車","腳踏車"]},
+    {emoji:"🚏", word_en:"stop",   word_zh:"站牌",  word_zhuyin:"ㄓㄢˋ ㄆㄞˊ",    s_en:"The bus slows down at every ___.", s_zh:"公車在每個___都會減速。", e_en:"STOP — a place where the bus picks up passengers! 🚏", e_zh:"站牌（stop）— 公車讓乘客上下車的地方！🚏", dist_en:["sign","light","corner"],  dist_zh:["標誌","紅綠燈","轉角"]},
+    {emoji:"🚪", word_en:"door",   word_zh:"門",    word_zhuyin:"ㄇㄣˊ",           s_en:"Step through the ___ to board the bus.", s_zh:"穿過___登上公車。", e_en:"DOOR — you open this to get on or off the bus! 🚪", e_zh:"門（door）— 上下公車時打開的東西！🚪", dist_en:["wall","step","window"],  dist_zh:["牆","台階","窗戶"]},
+    {emoji:"🛣️", word_en:"road",   word_zh:"道路",  word_zhuyin:"ㄉㄠˋ ㄌㄨˋ",    s_en:"The bus drives along the ___.", s_zh:"公車沿著___行駛。", e_en:"ROAD — the surface that buses and cars drive on! 🛣️", e_zh:"道路（road）— 公車和汽車行駛的路面！🛣️", dist_en:["track","path","bridge"],  dist_zh:["軌道","小路","橋"]},
+    {emoji:"💺", word_en:"seat",   word_zh:"座位",  word_zhuyin:"ㄗㄨㄛˋ ㄨㄟˋ",  s_en:"Please sit in an empty ___ on the bus.", s_zh:"請坐在公車上空的___。", e_en:"SEAT — the place where you sit on the bus! 💺", e_zh:"座位（seat）— 你在公車上坐的地方！💺", dist_en:["spot","bench","chair"],  dist_zh:["地點","長椅","椅子"]},
+  ],
+  medium:[
+    {emoji:"🧑‍✈️", word_en:"driver",  word_zh:"司機",   word_zhuyin:"ㄙ ㄐㄧ",         s_en:"The ___ opens the door at each stop.", s_zh:"___在每個站牌開門。", e_en:"DRIVER — the person who controls the bus! 🧑‍✈️", e_zh:"司機（driver）— 控制公車的人！🧑‍✈️", dist_en:["helper","worker","guard"],  dist_zh:["助手","工人","警衛"]},
+    {emoji:"🗺️", word_en:"route",   word_zh:"路線",   word_zhuyin:"ㄌㄨˋ ㄒㄧㄢˋ",  s_en:"Bus 12 follows a fixed ___ through the city.", s_zh:"12號公車沿固定的___穿越城市。", e_en:"ROUTE — the path a bus follows every day! 🗺️", e_zh:"路線（route）— 公車每天走的路徑！🗺️", dist_en:["track","trail","road"],  dist_zh:["軌道","小徑","道路"]},
+    {emoji:"🎫", word_en:"ticket",  word_zh:"票",     word_zhuyin:"ㄆㄧㄠˋ",         s_en:"Buy a ___ before you hop on the bus.", s_zh:"上公車前先買___。", e_en:"TICKET — you need this to ride the bus! 🎫", e_zh:"票（ticket）— 搭公車需要這個！🎫", dist_en:["token","card","coin"],  dist_zh:["代幣","卡","硬幣"]},
+    {emoji:"🪟", word_en:"window",  word_zh:"窗戶",   word_zhuyin:"ㄔㄨㄤ ㄏㄨˋ",   s_en:"Look out the ___ at the city passing by.", s_zh:"從___看窗外的城市。", e_en:"WINDOW — the glass panel you look through on a bus! 🪟", e_zh:"窗戶（window）— 公車上你往外看的玻璃！🪟", dist_en:["mirror","screen","wall"],  dist_zh:["鏡子","螢幕","牆"]},
+    {emoji:"⚙️", word_en:"wheel",   word_zh:"輪子",   word_zhuyin:"ㄌㄨㄣˊ ˙ㄗ",    s_en:"The big bus rolls on six huge ___s.", s_zh:"大公車靠六個大___滾動。", e_en:"WHEEL — the round part that makes the bus roll! ⚙️", e_zh:"輪子（wheel）— 讓公車滾動的圓形零件！⚙️", dist_en:["axle","engine","tire"],  dist_zh:["車軸","引擎","輪胎"]},
+  ],
+  hard:[
+    {emoji:"📅", word_en:"schedule",    word_zh:"時刻表",  word_zhuyin:"ㄕˊ ㄎㄜˋ ㄅㄧㄠˇ",  s_en:"Check the bus ___ to see when it arrives.", s_zh:"查看公車___以了解到達時間。", e_en:"SCHEDULE — a timetable showing when buses arrive! 📅", e_zh:"時刻表（schedule）— 顯示公車到達時間的時間表！📅", dist_en:["timetable","calendar","list"],  dist_zh:["時間表","日曆","清單"]},
+    {emoji:"🧑", word_en:"passenger",   word_zh:"乘客",    word_zhuyin:"ㄔㄥˊ ㄎㄜˋ",       s_en:"Each ___ pays a fare before boarding.", s_zh:"每位___在上車前付車費。", e_en:"PASSENGER — a person who rides on a bus! 🧑", e_zh:"乘客（passenger）— 搭乘公車的人！🧑", dist_en:["traveler","commuter","tourist"],  dist_zh:["旅人","通勤者","遊客"]},
+    {emoji:"📍", word_en:"destination", word_zh:"目的地",  word_zhuyin:"ㄇㄨˋ ㄉㄧˋ ㄉㄧˋ",  s_en:"Tell the driver your final ___.", s_zh:"告訴司機你的最終___。", e_en:"DESTINATION — the place you are travelling to! 📍", e_zh:"目的地（destination）— 你要去的地方！📍", dist_en:["direction","location","address"],  dist_zh:["方向","位置","地址"]},
+    {emoji:"🔄", word_en:"transfer",    word_zh:"轉乘",    word_zhuyin:"ㄓㄨㄢˇ ㄔㄥˊ",     s_en:"You need to ___ at Central Station for line 3.", s_zh:"你需要在中央站___搭乘3號線。", e_en:"TRANSFER — to switch from one bus to another! 🔄", e_zh:"轉乘（transfer）— 從一輛公車換乘另一輛！🔄", dist_en:["switch","change","connect"],  dist_zh:["換","改變","連接"]},
+    {emoji:"🏢", word_en:"terminal",    word_zh:"總站",    word_zhuyin:"ㄗㄨㄥˇ ㄓㄢˋ",     s_en:"The bus journey ends at the ___.", s_zh:"公車旅程在___結束。", e_en:"TERMINAL — the final stop at the end of a bus route! 🏢", e_zh:"總站（terminal）— 公車路線終點的最後一站！🏢", dist_en:["station","depot","stop"],  dist_zh:["車站","停車場","站牌"]},
+  ],
+};
+
+// ── OCEAN ──
+const QO={
+  easy:[
+    {emoji:"🌊", word_en:"sea",   word_zh:"海",   word_zhuyin:"ㄏㄞˇ",           s_en:"Swim carefully in the warm ___.", s_zh:"在溫暖的___裡小心游泳。", e_en:"SEA — the large body of salty water! 🌊", e_zh:"海（sea）— 廣大的鹹水水域！🌊", dist_en:["lake","pond","river"],  dist_zh:["湖","池塘","河流"]},
+    {emoji:"🐟", word_en:"fish",  word_zh:"魚",   word_zhuyin:"ㄩˊ",             s_en:"The colorful ___ swims in the coral reef.", s_zh:"五彩繽紛的___在珊瑚礁中游泳。", e_en:"FISH — a scaly creature that lives in the sea! 🐟", e_zh:"魚（fish）— 生活在海裡有鱗片的動物！🐟", dist_en:["crab","bird","whale"],  dist_zh:["螃蟹","鳥","鯨魚"]},
+    {emoji:"🌊", word_en:"wave",  word_zh:"海浪", word_zhuyin:"ㄏㄞˇ ㄌㄤˋ",   s_en:"The big ___ crashed onto the sandy beach.", s_zh:"大___拍打在沙灘上。", e_en:"WAVE — water that rolls and crashes on the shore! 🌊", e_zh:"海浪（wave）— 在海岸翻滾拍打的水！🌊", dist_en:["wind","tide","splash"],  dist_zh:["風","潮水","飛濺"]},
+    {emoji:"⛵", word_en:"boat",  word_zh:"船",   word_zhuyin:"ㄔㄨㄢˊ",         s_en:"We sailed on a little ___ across the bay.", s_zh:"我們乘坐一艘小___穿越海灣。", e_en:"BOAT — a small vessel that travels on water! ⛵", e_zh:"船（boat）— 在水上航行的小型船隻！⛵", dist_en:["ship","raft","kayak"],  dist_zh:["大船","木筏","獨木舟"]},
+    {emoji:"🏖️", word_en:"sand",  word_zh:"沙",   word_zhuyin:"ㄕㄚ",             s_en:"We built a big castle in the ___.", s_zh:"我們在___裡建了一座大城堡。", e_en:"SAND — tiny grains on the beach by the sea! 🏖️", e_zh:"沙（sand）— 海邊沙灘上的細小顆粒！🏖️", dist_en:["mud","dirt","snow"],  dist_zh:["泥土","土","雪"]},
+  ],
+  medium:[
+    {emoji:"🌊", word_en:"ocean",  word_zh:"海洋",  word_zhuyin:"ㄏㄞˇ ㄧㄤˊ",  s_en:"The Pacific is the biggest ___ on Earth.", s_zh:"太平洋是地球上最大的___。", e_en:"OCEAN — the biggest body of water on our planet! 🌊", e_zh:"海洋（ocean）— 地球上最大的水域！🌊", dist_en:["river","lake","sea"],   dist_zh:["河流","湖","海"]},
+    {emoji:"⚓",  word_en:"sailor", word_zh:"水手",  word_zhuyin:"ㄕㄨㄟˇ ㄕㄡˇ", s_en:"The ___ worked on the ship for ten years.", s_zh:"___在船上工作了十年。", e_en:"SAILOR — a person who works and travels on ships! ⚓", e_zh:"水手（sailor）— 在船上工作和航行的人！⚓", dist_en:["captain","diver","fisher"],  dist_zh:["船長","潛水員","漁夫"]},
+    {emoji:"⚓",  word_en:"anchor", word_zh:"錨",    word_zhuyin:"ㄇㄠˊ",          s_en:"Drop the ___ to keep the ship from drifting.", s_zh:"拋下___防止船隻漂移。", e_en:"ANCHOR — the heavy weight that holds a ship in place! ⚓", e_zh:"錨（anchor）— 固定船隻的重物！⚓", dist_en:["hook","chain","rope"],  dist_zh:["鉤子","鐵鍊","繩子"]},
+    {emoji:"🦈",  word_en:"shark",  word_zh:"鯊魚",  word_zhuyin:"ㄕㄚ ㄩˊ",      s_en:"The ___ glided silently through the deep water.", s_zh:"___悄悄地在深水中滑行。", e_en:"SHARK — a powerful fish with very sharp teeth! 🦈", e_zh:"鯊魚（shark）— 有非常鋒利牙齒的強大魚類！🦈", dist_en:["whale","dolphin","tuna"],  dist_zh:["鯨魚","海豚","鮪魚"]},
+    {emoji:"🪸",  word_en:"coral",  word_zh:"珊瑚",  word_zhuyin:"ㄕㄢ ㄏㄨˊ",    s_en:"Thousands of tiny fish hide in the ___ reef.", s_zh:"數千條小魚躲在___礁中。", e_en:"CORAL — colorful sea creatures that form reefs! 🪸", e_zh:"珊瑚（coral）— 形成礁石的彩色海洋生物！🪸", dist_en:["seaweed","kelp","rock"],  dist_zh:["海藻","昆布","石頭"]},
+  ],
+  hard:[
+    {emoji:"🎖️", word_en:"captain",    word_zh:"船長",   word_zhuyin:"ㄔㄨㄢˊ ㄓㄤˇ",   s_en:"The ___ commands every crew member on the ship.", s_zh:"___指揮船上的每位船員。", e_en:"CAPTAIN — the person in command of a ship! 🎖️", e_zh:"船長（captain）— 指揮整艘船的人！🎖️", dist_en:["sailor","officer","admiral"],  dist_zh:["水手","官員","海軍上將"]},
+    {emoji:"🐬", word_en:"dolphin",    word_zh:"海豚",   word_zhuyin:"ㄏㄞˇ ㄊㄨㄣˊ",   s_en:"The playful ___ leaped out of the shimmering sea.", s_zh:"頑皮的___從波光粼粼的海中躍出。", e_en:"DOLPHIN — a clever, playful sea mammal! 🐬", e_zh:"海豚（dolphin）— 聰明又愛玩的海洋哺乳動物！🐬", dist_en:["porpoise","whale","seal"],  dist_zh:["鼠海豚","鯨魚","海豹"]},
+    {emoji:"⚓", word_en:"harbor",     word_zh:"港口",   word_zhuyin:"ㄍㄤˇ ㄎㄡˇ",     s_en:"The fishing boat returned safely to the ___.", s_zh:"漁船安全地返回___。", e_en:"HARBOR — a safe place where ships can dock! ⚓", e_zh:"港口（harbor）— 船隻可以停靠的安全地方！⚓", dist_en:["marina","port","dock"],  dist_zh:["遊艇港","港埠","碼頭"]},
+    {emoji:"🗼", word_en:"lighthouse", word_zh:"燈塔",   word_zhuyin:"ㄉㄥ ㄊㄚˇ",       s_en:"The ___ warned sailors away from the rocky coast.", s_zh:"___警告水手遠離岩岸。", e_en:"LIGHTHOUSE — a tall tower with a light to guide ships! 🗼", e_zh:"燈塔（lighthouse）— 有燈光引導船隻的高塔！🗼", dist_en:["beacon","tower","signal"],  dist_zh:["信標","塔","信號"]},
+    {emoji:"🤿", word_en:"submarine",  word_zh:"潛水艇", word_zhuyin:"ㄑㄧㄢˊ ㄕㄨㄟˇ ㄊㄧㄥˇ", s_en:"The ___ dove deep beneath the icy waves.", s_zh:"___潛入冰冷的海浪深處。", e_en:"SUBMARINE — a ship that travels under the water! 🤿", e_zh:"潛水艇（submarine）— 在水下行進的船隻！🤿", dist_en:["torpedo","vessel","warship"],  dist_zh:["魚雷","船隻","軍艦"]},
+  ],
+};
+
+const BANKS={airline:QA,bus:QB,ocean:QO};
+
+// ════════════════════════════════════════════════════
+// BUILD QUESTIONS
+// ════════════════════════════════════════════════════
+function buildQuestions(theme,diff){
+  const bank=BANKS[theme][diff];
+  const shuffled=shuffle(bank).slice(0,TOTAL);
+  return shuffled.map(q=>{
+    const opts_en=shuffle([q.word_en,...q.dist_en]);
+    const opts_zh=shuffle([q.word_zh,...q.dist_zh]);
+    return Object.assign({},q,{opts_en,opts_zh});
+  });
+}
+
+// ════════════════════════════════════════════════════
+// GAME
+// ════════════════════════════════════════════════════
+function startGame(){
+  const nm=document.getElementById("name-input").value.trim();
+  if(!nm){
+    const inp=document.getElementById("name-input");
+    inp.style.borderColor="#ef4444";
+    inp.placeholder=I18N.t("noName");
+    setTimeout(()=>{inp.style.borderColor="";inp.placeholder=I18N.t("namePH");},2000);
+    return;
+  }
+  Object.assign(GS,{name:nm,qs:buildQuestions(GS.theme,GS.diff),qi:0,score:0,streak:0,best:0,hints:2,correct:0,timeSum:0,answered:false});
+  show("game");
+  loadQ();
+}
+
+function loadQ(){
+  if(GS.qi>=TOTAL){endGame();return;}
+  const q=GS.qs[GS.qi];
+  const th=THEMES[GS.theme];
+  GS.answered=false;
+  GS._qStart=Date.now();
+  const zh=I18N.lang==="zh-tw";
+
+  // header
+  document.getElementById("g-score").textContent=`⭐ ${GS.score} ${I18N.t("ptsLabel")}`;
+  document.getElementById("g-qnum").textContent=`Q ${GS.qi+1} / ${TOTAL}`;
+  document.getElementById("g-prog").style.width=`${((GS.qi+1)/TOTAL)*100}%`;
+  updStreak();
+
+  // scene
+  document.getElementById("g-scene").style.background=th.bg;
+  document.getElementById("g-visuals").textContent=q.emoji;
+  document.getElementById("g-story").innerHTML=zh?ZH.annotate(q.s_zh):q.s_en;
+  document.getElementById("g-question").innerHTML="❓ "+(zh?ZH.annotate(I18N.t("qPrompt")):I18N.t("qPrompt"));
+
+  // answers
+  for(let i=0;i<4;i++){
+    const b=document.getElementById("a"+i);
+    b.textContent=zh?q.opts_zh[i]:q.opts_en[i];
+    b.setAttribute("data-val",zh?q.opts_zh[i]:q.opts_en[i]);
+    b.className="ans-btn";b.disabled=false;b.style.opacity="";
+  }
+
+  updHint();
+  tickStart(DIFFS[GS.diff].secs);
+  setTimeout(speakQ,350);
+}
+
+function pick(i){
+  if(GS.answered)return;
+  GS.answered=true;
+  window.speechSynthesis&&window.speechSynthesis.cancel();
+  clearInterval(GS.timer);
+
+  const q=GS.qs[GS.qi];
+  const zh=I18N.lang==="zh-tw";
+  const selected=document.getElementById("a"+i).getAttribute("data-val");
+  const correct=zh?q.word_zh:q.word_en;
+  const ok=selected===correct;
+
+  const secs=Math.round((Date.now()-GS._qStart)/1000);
+  const max=DIFFS[GS.diff].secs;
+  GS.timeSum+=Math.min(secs,max);
+
+  // highlight all buttons
+  for(let k=0;k<4;k++){
+    const b=document.getElementById("a"+k);
+    b.disabled=true;
+    const bVal=b.getAttribute("data-val");
+    if(bVal===correct)b.classList.add("correct");
+  }
+  if(!ok)document.getElementById("a"+i).classList.add("wrong");
+
+  let pts=0;
+  if(ok){
+    pts=10;if(secs<=max/2)pts+=3;
+    GS.streak++;if(GS.streak>GS.best)GS.best=GS.streak;if(GS.streak>=3)pts+=2;
+    GS.score+=pts;GS.correct++;
+    popScore(`+${pts}`);
+  }else{GS.streak=0;}
+  GS.answers=(GS.answers||[]).concat({ok,secs});
+  setTimeout(()=>showFB(ok,q,pts),550);
+}
+
+function timeUp(){
+  if(GS.answered)return;
+  GS.answered=true;
+  window.speechSynthesis&&window.speechSynthesis.cancel();
+  const q=GS.qs[GS.qi];
+  GS.streak=0;
+  const zh=I18N.lang==="zh-tw";
+  const correct=zh?q.word_zh:q.word_en;
+  for(let k=0;k<4;k++){
+    const b=document.getElementById("a"+k);b.disabled=true;
+    if(b.getAttribute("data-val")===correct)b.classList.add("correct");
+  }
+  GS.timeSum+=DIFFS[GS.diff].secs;
+  showFB(false,q,0,true);
+}
+
+function useHint(){
+  if(GS.hints<=0||GS.answered)return;
+  GS.hints--;updHint();
+  const q=GS.qs[GS.qi];
+  const zh=I18N.lang==="zh-tw";
+  const correct=zh?q.word_zh:q.word_en;
+  const wrongs=[];
+  for(let i=0;i<4;i++){
+    const b=document.getElementById("a"+i);
+    if(b.getAttribute("data-val")!==correct&&!b.disabled)wrongs.push(i);
+  }
+  shuffle(wrongs).slice(0,2).forEach(i=>{
+    const b=document.getElementById("a"+i);b.disabled=true;b.classList.add("faded");
+  });
+}
+
+const CHEERS_EN=["Great job! 🎉","Awesome! 🌟","Correct! 💪","Brilliant! 🧠","You got it! 🎯","Spot on! ✨"];
+const CHEERS_ZH=["太棒了！🎉","好厲害！🌟","答對了！💪","超聰明！🧠","就是這樣！🎯","完全正確！✨"];
+
+function showFB(ok,q,pts,timeout){
+  timeout=timeout||false;
+  const zh=I18N.lang==="zh-tw";
+  const cheers=zh?CHEERS_ZH:CHEERS_EN;
+  document.getElementById("fb-icon").textContent=ok?"✅":(timeout?"⏰":"❌");
+
+  // word display
+  document.getElementById("fb-word-en").textContent=q.word_en.toUpperCase();
+  document.getElementById("fb-word-zh").textContent=q.word_zh;
+  document.getElementById("fb-zhuyin").textContent=q.word_zhuyin;
+
+  // explanation
+  const expl=zh?q.e_zh:q.e_en;
+  document.getElementById("fb-expl").innerHTML=zh?ZH.annotate(expl):expl;
+
+  const more=GS.qi+1<TOTAL;
+  const btn=document.getElementById("fb-btn");
+  btn.textContent=!more?I18N.t("seeResults"):(ok?I18N.t("keepGoing"):I18N.t("understand"));
+  btn.className=`next-btn ${ok?"ok":"oh"}`;
+  document.getElementById("overlay").classList.add("active");
+
+  // speak English word
+  setTimeout(()=>speak(q.word_en),400);
+}
+
+function nextQ(){
+  document.getElementById("overlay").classList.remove("active");
+  GS.qi++;loadQ();
+}
+
+function updStreak(){
+  const zh=I18N.lang==="zh-tw";
+  document.getElementById("g-streak").textContent=GS.streak>=3
+    ?(zh?`🔥 連勝 ${GS.streak} 次！`:`🔥 ${GS.streak} Streak!`):"";
+}
+function updHint(){
+  const n=GS.hints,zh=I18N.lang==="zh-tw";
+  document.getElementById("g-hint-info").textContent=zh?`💡 剩 ${n} 個提示`:`💡 ${n} hint${n!==1?"s":""} left`;
+  document.getElementById("g-hint-btn").disabled=n===0;
+}
+
+function popScore(txt){
+  const el=document.createElement("div");el.className="score-pop";el.textContent=txt;
+  el.style.left=r(20,70)+"%";el.style.top=r(30,50)+"%";
+  document.getElementById("card").appendChild(el);setTimeout(()=>el.remove(),1000);
+}
+
+// ════════════════════════════════════════════════════
+// END GAME
+// ════════════════════════════════════════════════════
+function endGame(){
+  clearInterval(GS.timer);saveScore();
+  const acc=Math.round((GS.correct/TOTAL)*100);
+  const avg=GS.timeSum>0?Math.round(GS.timeSum/TOTAL):0;
+  const stars=acc>=90?"⭐⭐⭐":acc>=70?"⭐⭐":"⭐";
+  const zh=I18N.lang==="zh-tw";
+  document.getElementById("r-stars").textContent=stars;
+  document.getElementById("r-pts").textContent=GS.score;
+  document.getElementById("r-correct").textContent=`${GS.correct}/${TOTAL}`;
+  document.getElementById("r-acc").textContent=`${acc}%`;
+  document.getElementById("r-avg").textContent=`${avg}s`;
+  document.getElementById("r-streak").textContent=GS.best;
+  show("results");
+  buildShareRow(GS.score,GS.diff);
+  if(acc>=90)setTimeout(confetti,350);
+  const msg=acc>=90?(zh?"你太厲害了！所有單字都答對！":"Perfect score! You know all the words!")
+    :acc>=70?(zh?"做得很好！":"Well done!")
+    :(zh?"繼續學習，加油！":"Keep learning, you can do it!");
+  setTimeout(()=>speak(msg),400);
+}
+
+function buildShareRow(score,diff){
+  const url="https://hsinhoyeh.github.io/word-adventure/";
+  const diffLabel=I18N.t("d"+diff.charAt(0).toUpperCase()+diff.slice(1)).replace(/^[^\w]/,"").trim();
+  const text=I18N.t("shareTpl").replace("{score}",score).replace("{diff}",diffLabel);
+  const enc=encodeURIComponent(text+" "+url);
+  const encUrl=encodeURIComponent(url);
+  const links=[
+    {cls:"sb-x",    icon:"𝕏", label:"X",        href:`https://twitter.com/intent/tweet?text=${enc}`},
+    {cls:"sb-fb",   icon:"f", label:"Facebook",  href:`https://www.facebook.com/sharer/sharer.php?u=${encUrl}&quote=${encodeURIComponent(text)}`},
+    {cls:"sb-line", icon:"L", label:"LINE",       href:`https://line.me/R/msg/text/?${enc}`},
+    {cls:"sb-wa",   icon:"W", label:"WhatsApp",   href:`https://wa.me/?text=${enc}`},
+  ];
+  document.getElementById("share-row").innerHTML=links.map(l=>
+    `<a class="share-btn ${l.cls}" href="${l.href}" target="_blank" rel="noopener">${l.icon} ${l.label}</a>`
+  ).join("");
+}
+
+// ════════════════════════════════════════════════════
+// LEADERBOARD
+// ════════════════════════════════════════════════════
+function saveScore(){
+  const key=`wa_lb_${GS.diff}`;
+  const entry={name:GS.name,score:GS.score,theme:GS.theme,acc:Math.round((GS.correct/TOTAL)*100)};
+  let board=JSON.parse(localStorage.getItem(key)||"[]");
+  board.push(entry);board.sort((a,b)=>b.score-a.score);board=board.slice(0,10);
+  localStorage.setItem(key,JSON.stringify(board));
+}
+
+function openLB(){show("lb");lbTab(document.querySelector(".lb-tab"),"easy");}
+
+function lbTab(el,diff){
+  document.querySelectorAll(".lb-tab").forEach(t=>t.classList.remove("active"));
+  el.classList.add("active");
+  const board=JSON.parse(localStorage.getItem(`wa_lb_${diff}`)||"[]");
+  const list=document.getElementById("lb-list");
+  if(!board.length){list.innerHTML=`<li class="lb-empty">${I18N.t("lbEmpty")}</li>`;return;}
+  const medals=["🥇","🥈","🥉"],cls=["gold","silver","bronze"];
+  list.innerHTML=board.map((e,i)=>`
+    <li class="lb-item ${cls[i]||""} ${e.name===GS.name?"me":""}">
+      <span class="lb-rank">${medals[i]||(i+1)+"."}</span>
+      <span class="lb-name">${ZH.esc(e.name)}</span>
+      <span class="lb-theme">${THEMES[e.theme]?THEMES[e.theme].emoji:""}</span>
+      <span class="lb-pts">${e.score} ${I18N.t("ptsLabel")}</span>
+    </li>`).join("");
+}
+
+// ════════════════════════════════════════════════════
+// TIMER
+// ════════════════════════════════════════════════════
+function tickStart(secs){
+  clearInterval(GS.timer);GS.t=secs;
+  const arc=document.getElementById("t-arc"),num=document.getElementById("t-num");
+  const circ=2*Math.PI*24;
+  function tick(){
+    num.textContent=GS.t;
+    arc.style.strokeDashoffset=circ*(1-GS.t/secs);
+    arc.className="t-fill "+(GS.t<=secs*.25?"danger":GS.t<=secs*.5?"warn":"");
+    num.className="timer-num "+(GS.t<=secs*.25?"danger":"");
+  }
+  tick();
+  GS.timer=setInterval(()=>{GS.t--;tick();if(GS.t<=0){clearInterval(GS.timer);timeUp();}},1000);
+}
+
+// ════════════════════════════════════════════════════
+// UI
+// ════════════════════════════════════════════════════
+function show(name){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById("s-"+name).classList.add("active");
+  window.speechSynthesis&&window.speechSynthesis.cancel();
+}
+function pickTheme(el,t){
+  GS.theme=t;
+  document.querySelectorAll(".theme-card").forEach(c=>c.classList.remove("active"));
+  el.classList.add("active");
+}
+function pickDiff(el,d){
+  GS.diff=d;
+  document.querySelectorAll(".diff-btn").forEach(b=>b.classList.remove("active"));
+  el.classList.add("active");
+}
+
+// ════════════════════════════════════════════════════
+// CONFETTI
+// ════════════════════════════════════════════════════
+function confetti(){
+  const cols=["#f59e0b","#f97316","#22c55e","#38bdf8","#f43f5e","#fbbf24","#a855f7"];
+  for(let i=0;i<70;i++)setTimeout(()=>{
+    const el=document.createElement("div");el.className="confetti";
+    el.style.background=cols[r(0,cols.length-1)];el.style.left=r(0,100)+"vw";el.style.top="-20px";
+    el.style.animationDuration=(1+Math.random()*1.2)+"s";el.style.animationDelay=(Math.random()*.6)+"s";
+    document.body.appendChild(el);setTimeout(()=>el.remove(),2500);
+  },i*25);
+}
+
+// ════════════════════════════════════════════════════
+// HOME TICKER — cycles ✈️ → 🚌 → 🌊 every 2 seconds
+// ════════════════════════════════════════════════════
+const TICKER_EMOJIS=["✈️","🚌","🌊"];
+let _tickerIdx=0;
+
+// ════════════════════════════════════════════════════
+// I18N live-update on language change
+// ════════════════════════════════════════════════════
+I18N.onChange(lang=>{
+  if(document.getElementById("s-game").classList.contains("active")&&GS.qs[GS.qi]&&!GS.answered){
+    const q=GS.qs[GS.qi];const zh=lang==="zh-tw";
+    document.getElementById("g-story").innerHTML=zh?ZH.annotate(q.s_zh):q.s_en;
+    document.getElementById("g-question").innerHTML="❓ "+(zh?ZH.annotate(I18N.t("qPrompt")):I18N.t("qPrompt"));
+    // refresh button text
+    for(let i=0;i<4;i++){
+      const b=document.getElementById("a"+i);
+      b.textContent=zh?q.opts_zh[i]:q.opts_en[i];
+      b.setAttribute("data-val",zh?q.opts_zh[i]:q.opts_en[i]);
+    }
+  }
+  document.getElementById("g-score").textContent=`⭐ ${GS.score} ${I18N.t("ptsLabel")}`;
+  updHint();updStreak();
+});
+
+// ════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════
+I18N.init();
+
+// Ticker rotation
+document.addEventListener("DOMContentLoaded",function(){
+  const tv=document.getElementById("ticker-v");
+  if(tv){
+    setInterval(function(){
+      _tickerIdx=(_tickerIdx+1)%TICKER_EMOJIS.length;
+      tv.textContent=TICKER_EMOJIS[_tickerIdx];
+    },2000);
+  }
+});
+</script>
+</body>
+</html>
